@@ -89,4 +89,19 @@ const loginUser = async (req, res) => {
         console.log(error);
     }
 };
-export { registerUser, loginUser, };
+const logoutUser = async (req, res) => {
+    // need to be logged in to logout
+    if (!req.cookies?.accessToken) {
+        res.status(400).json({
+            "success": false,
+            "message": "user is not logged in",
+        });
+        return;
+    }
+    // if here then logged in
+    res.clearCookie('accessToken').json({
+        "success": true,
+        "message": "user successfully logged out"
+    });
+};
+export { registerUser, loginUser, logoutUser, };
