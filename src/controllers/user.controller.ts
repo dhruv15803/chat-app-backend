@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import getCloudinaryUrl from "../utils/getCloudinaryUrl.js";
 import { User } from "../models/user.model.js";
+import fs from 'fs'
 
 const getAvatarUrl = async (req: Request, res: Response) => {
   try {
@@ -19,6 +20,7 @@ const getAvatarUrl = async (req: Request, res: Response) => {
         message: "cloudinary service failed",
       });
     }
+    fs.unlinkSync(filePath);
     res.status(200).json({
       success: true,
       url,

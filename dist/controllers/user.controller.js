@@ -1,5 +1,6 @@
 import getCloudinaryUrl from "../utils/getCloudinaryUrl.js";
 import { User } from "../models/user.model.js";
+import fs from 'fs';
 const getAvatarUrl = async (req, res) => {
     try {
         if (!req.file?.path) {
@@ -17,6 +18,7 @@ const getAvatarUrl = async (req, res) => {
                 message: "cloudinary service failed",
             });
         }
+        fs.unlinkSync(filePath);
         res.status(200).json({
             success: true,
             url,
