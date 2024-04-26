@@ -43,4 +43,18 @@ const getLoggedInUser = async (req: Request, res: Response) => {
   }
 };
 
-export { getAvatarUrl, getLoggedInUser };
+
+
+const getAllUsers = async (req:Request,res:Response) => {
+  try {
+    const users = await User.find({_id:{$ne:req.userId}});
+    res.status(200).json({
+      "success":true,
+      users,
+    })
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export { getAvatarUrl, getLoggedInUser ,getAllUsers};
