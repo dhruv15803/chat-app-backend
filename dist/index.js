@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
 import messageRoutes from './routes/message.routes.js';
+import groupRoutes from './routes/group.routes.js';
 const port = process.env.PORT;
 const app = express();
 // connect to db
@@ -20,6 +21,7 @@ app.use(cors({
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/message', messageRoutes);
+app.use('/api/group', groupRoutes);
 app.listen(port, () => {
     console.log(`server running at http://localhost:${port}`);
 });
