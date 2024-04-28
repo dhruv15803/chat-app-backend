@@ -131,6 +131,37 @@ const getConversation = async (req, res) => {
         console.log(error);
     }
 };
+const forwardMessage = async (req, res) => {
+    try {
+        const { message, receiverId } = req.body;
+        const senderId = req.userId;
+        if (message.trim() === "") {
+            return res.status(400).json({
+                "success": false,
+                "message": "forwarded message is an empty string"
+            });
+        }
+        const newForwardedMessage = await Message.create({ senderId, receiverId, message, isForwarded: true });
+        // if no conversation exists between sender and receiver -> CREATE ONE
+        // if convo exists -> UPDATE CONVO BY ADDING THE MESSAGE ID IN MESSAGES ARRAY
+        let conversation = await Conversation.findOne({ participants: { $all: [senderId, receiverId] } });
+        if (!conversation) {
+            conversation = await Conversation.create({ participants: [senderId, receiverId], messages: [newForwardedMessage._id] });
+        }
+        else {
+            conversation.messages.push(newForwardedMessage._id);
+            await conversation.save();
+        }
+        res.status(201).json({
+            "success": true,
+            "message": "succesfully forwarded message",
+            "forwardedMessage": newForwardedMessage,
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
+};
 const getMessagesFromSenderId = async (req, res) => {
     try {
         const { senderId } = req.params;
@@ -159,4 +190,4 @@ const getMessagesFromLoggedInUser = async (req, res) => {
         console.log(error);
     }
 };
-export { createMessage, getMessagesFromSenderId, getMessagesFromLoggedInUser, getConversation, deleteMessage, editMessage, };
+export { createMessage, getMessagesFromSenderId, getMessagesFromLoggedInUser, getConversation, deleteMessage, editMessage, forwardMessage, };

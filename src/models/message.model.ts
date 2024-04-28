@@ -15,6 +15,10 @@ export const messageSchema = new mongoose.Schema({
     message:{
         type:String,
         required:true,
+    },
+    isForwarded:{
+        type:Boolean,
+        default:false,
     }
 },{timestamps:true});
 

@@ -1,5 +1,5 @@
 import express from 'express';
-import { createMessage, deleteMessage, editMessage, getConversation, getMessagesFromLoggedInUser, getMessagesFromSenderId } from '../controllers/message.controller.js';
+import { createMessage, deleteMessage, editMessage, forwardMessage, getConversation, getMessagesFromLoggedInUser, getMessagesFromSenderId } from '../controllers/message.controller.js';
 import { protectRoute } from '../middlewares/user.middleware.js';
 const router = express.Router();
 router.post('/create', protectRoute, createMessage);
@@ -8,4 +8,5 @@ router.get('/getMessagesLoggedIn/:receiverId', protectRoute, getMessagesFromLogg
 router.get('/getConversation/:receiverId', protectRoute, getConversation);
 router.delete('/deleteMessage/:receiverId/:messageId', protectRoute, deleteMessage);
 router.put('/editMessage', protectRoute, editMessage);
+router.post('/forward', protectRoute, forwardMessage);
 export default router;

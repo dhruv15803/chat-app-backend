@@ -23,7 +23,7 @@ const createGroup = async (req, res) => {
         // creating the group , add the logged in user as a participant.
         const userId = req.userId;
         const user = await User.findOne({ _id: userId });
-        const newGroup = await Group.create({ groupName, participants: [user?._id] });
+        const newGroup = await Group.create({ groupName, participants: [user?._id], owner: user?._id });
         res.status(201).json({
             "success": true,
             "message": "successfully created group",
