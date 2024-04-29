@@ -190,4 +190,29 @@ const getMessagesFromLoggedInUser = async (req, res) => {
         console.log(error);
     }
 };
-export { createMessage, getMessagesFromSenderId, getMessagesFromLoggedInUser, getConversation, deleteMessage, editMessage, forwardMessage, };
+const clearChatMessages = async (req, res) => {
+    try {
+        const { receiverId } = req.params;
+        const senderId = req.userId;
+        await Conversation.deleteOne({ participants: { $all: [senderId, receiverId] } });
+        const deletedConvo = await Conversation.findOne({ participants: { $all: [senderId, receiverId] } });
+        if (deletedConvo) {
+            res.status(500).json({
+                "success": false,
+                "message": "conversation not deleted",
+            });
+            return;
+        }
+        // after the conversation between logged in user and selected user is deleted
+        // The messages should also be deleted with senderId -> and receverId
+        await Message.deleteMany({ $or: [{ senderId: senderId, receiverId: receiverId }, { senderId: receiverId, receiverId: senderId }] });
+        res.status(200).json({
+            "success": true,
+            "message": "successfully deleted conversation",
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
+};
+export { createMessage, getMessagesFromSenderId, getMessagesFromLoggedInUser, getConversation, deleteMessage, editMessage, forwardMessage, clearChatMessages, };
