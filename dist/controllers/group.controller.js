@@ -2,7 +2,7 @@ import { Group } from "../models/Group.model.js";
 import { User } from "../models/user.model.js";
 const createGroup = async (req, res) => {
     try {
-        const { groupName } = req.body;
+        const { groupName, groupUsers } = req.body;
         if (groupName.trim() === "") {
             res.status(400).json({
                 "success": false,
@@ -23,7 +23,7 @@ const createGroup = async (req, res) => {
         // creating the group , add the logged in user as a participant.
         const userId = req.userId;
         const user = await User.findOne({ _id: userId });
-        const newGroup = await Group.create({ groupName, participants: [user?._id], owner: user?._id });
+        const newGroup = await Group.create({ groupName, participants: [user?._id, ...groupUsers], owner: user?._id });
         res.status(201).json({
             "success": true,
             "message": "successfully created group",
@@ -45,7 +45,7 @@ const getMyGroups = async (req, res) => {
             });
             return;
         }
-        const groups = await Group.find({ participants: { $all: [user._id] } });
+        const groups = await Group.find({ owner: user._id });
         if (!groups) {
             res.json({
                 "success": false,

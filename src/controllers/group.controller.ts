@@ -5,7 +5,7 @@ import { User } from "../models/user.model.js";
 
 const createGroup = async (req:Request,res:Response) => {
     try {
-        const {groupName}:{groupName:string} = req.body;
+        const {groupName,groupUsers}:{groupName:string;groupUsers:string[]} = req.body;
         if(groupName.trim()==="") {
             res.status(400).json({
                 "success":false,
@@ -23,12 +23,13 @@ const createGroup = async (req:Request,res:Response) => {
             return;
         }
 
+
         // the logged in user will be creating the group so initially when
         // creating the group , add the logged in user as a participant.
         const userId = req.userId;
         const user = await User.findOne({_id:userId});
 
-        const newGroup = await Group.create({groupName,participants:[user?._id],owner:user?._id});
+        const newGroup = await Group.create({groupName,participants:[user?._id,...groupUsers],owner:user?._id});
         res.status(201).json({
             "success":true,
             "message":"successfully created group",
@@ -51,7 +52,7 @@ const getMyGroups = async (req:Request,res:Response) => {
             })
             return;
         }
-        const groups = await Group.find({participants:{$all:[user._id]}});
+        const groups = await Group.find({owner:user._id});
         if(!groups) {
             res.json({
                 "success":false,
@@ -66,9 +67,6 @@ const getMyGroups = async (req:Request,res:Response) => {
         console.log(error);
     }
 }
-
-
-
 
 export {
     createGroup,
