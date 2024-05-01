@@ -6,7 +6,7 @@ const generateTokenAndSetCookies = (user, res) => {
     res.cookie('accessToken', token, {
         httpOnly: true,
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
-        secure: true,
+        domain: '.vercel.app', path: '/'
     });
 };
 export default generateTokenAndSetCookies;
