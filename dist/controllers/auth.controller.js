@@ -98,6 +98,7 @@ const logoutUser = async (req, res) => {
         });
         return;
     }
+    console.log(req.cookies);
     // if here then logged in
     res.clearCookie('accessToken').json({
         "success": true,
