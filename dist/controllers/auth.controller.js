@@ -100,7 +100,11 @@ const logoutUser = async (req, res) => {
     }
     console.log(req.cookies);
     // if here then logged in
-    res.clearCookie('accessToken').json({
+    res.clearCookie('accessToken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none'
+    }).json({
         "success": true,
         "message": "user successfully logged out"
     });
