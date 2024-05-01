@@ -1,5 +1,6 @@
 import { Message } from '../models/message.model.js';
 import { Conversation } from '../models/conversation.model.js';
+import { User } from '../models/user.model.js';
 const createMessage = async (req, res) => {
     try {
         // need to be logged in to create/send a message
@@ -133,7 +134,8 @@ const getConversation = async (req, res) => {
 };
 const forwardMessage = async (req, res) => {
     try {
-        const { message, receiverId } = req.body;
+        const { message, forwardUsers } = req.body;
+        // forwardUsers is an array of userId's
         const senderId = req.userId;
         if (message.trim() === "") {
             return res.status(400).json({
@@ -141,21 +143,23 @@ const forwardMessage = async (req, res) => {
                 "message": "forwarded message is an empty string"
             });
         }
-        const newForwardedMessage = await Message.create({ senderId, receiverId, message, isForwarded: true });
-        // if no conversation exists between sender and receiver -> CREATE ONE
-        // if convo exists -> UPDATE CONVO BY ADDING THE MESSAGE ID IN MESSAGES ARRAY
-        let conversation = await Conversation.findOne({ participants: { $all: [senderId, receiverId] } });
-        if (!conversation) {
-            conversation = await Conversation.create({ participants: [senderId, receiverId], messages: [newForwardedMessage._id] });
+        for (let i = 0; i < forwardUsers.length; i++) {
+            const receiverId = forwardUsers[i];
+            const newForwardedMessage = await Message.create({ senderId, receiverId, message, isForwarded: true });
+            let conversation = await Conversation.findOne({ participants: { $all: [senderId, receiverId] } });
+            if (!conversation) {
+                conversation = await Conversation.create({ participants: [senderId, receiverId], messages: [newForwardedMessage._id] });
+            }
+            else {
+                conversation.messages.push(newForwardedMessage._id);
+                await conversation.save();
+            }
         }
-        else {
-            conversation.messages.push(newForwardedMessage._id);
-            await conversation.save();
-        }
+        const firstForwardedUser = await User.findOne({ _id: forwardUsers[0] });
         res.status(201).json({
             "success": true,
             "message": "succesfully forwarded message",
-            "forwardedMessage": newForwardedMessage,
+            firstForwardedUser,
         });
     }
     catch (error) {
