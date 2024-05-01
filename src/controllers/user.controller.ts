@@ -13,6 +13,7 @@ const getAvatarUrl = async (req: Request, res: Response) => {
       return;
     }
     const filePath = req.file.path;
+    console.log(filePath);
     const url = await getCloudinaryUrl(filePath, res);
     if (!url) {
       return res.status(500).json({
